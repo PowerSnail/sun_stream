@@ -1,0 +1,10 @@
+site_name: Sun Stream
+
+theme:
+  name: "readthedocs"
+
+plugins:
+  - mkdocstrings
+
+watch:
+  - .
