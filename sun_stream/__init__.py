@@ -29,7 +29,7 @@ of waiting for the next event to happen.
 
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 from typing import Iterable
 import requests
@@ -124,7 +124,7 @@ def _sun_time_gen(latitude, longtitude, now: datetime):
         yield now, SunAction.SET
 
     while True:
-        date = date + datetime.timedelta(days=1)
+        date = date + timedelta(days=1)
         sunrise, sunset = _fetch_sun_times(latitude, longtitude, date.isoformat())
         yield sunrise, SunAction.RISE
         yield sunset, SunAction.SET
