@@ -111,7 +111,8 @@ def _sun_time_gen(latitude, longtitude, now: datetime):
     date = now.date()
 
     sunrise, sunset = _fetch_sun_times(latitude, longtitude, date.isoformat())
-
+    now = now.astimezone(sunrise.tzinfo)
+    
     if now < sunrise:
         yield now, SunAction.SET
         yield sunrise, SunAction.RISE
