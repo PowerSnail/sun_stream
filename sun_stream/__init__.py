@@ -36,9 +36,11 @@ import requests
 import enum
 
 
+__all__ = ["SunAction", "sun_stream"]
+
+
 class SunAction(enum.Enum):
-    """Two actions of the sun: RISE and SET.
-    """
+    """Two actions of the sun: RISE and SET."""
 
     RISE = enum.auto()
     SET = enum.auto()
@@ -74,20 +76,28 @@ def sun_stream(
         next(generator)
 
     for scheduled_time, action in generator:
-        _wait_until(scheduled_time)
+        time.sleep(_seconds_until(scheduled_time))
         yield action
+
+
+def _seconds_until(deadline: datetime) -> float:
+    """Returns the length of time from now to deadline, in seconds
+
+    Args:
+        deadline (datetime): The instance of time.
+
+    Returns:
+        float: Total seconds from now to `deadline`
+    """
+    now = datetime.now()
+    seconds = max(0, (deadline - now).total_seconds())
+    return seconds
 
 
 _URL = "https://api.sunrise-sunset.org/json?lat={latitude}&lng={longitude}"
 
 
-def _wait_until(deadline: datetime):
-    now = datetime.now()
-    seconds = max(0, (deadline - now).total_seconds())
-    time.sleep(seconds)
-
-
-def _get_sun_times(latitude, longitude, date):
+def _fetch_sun_times(latitude, longitude, date):
     response = requests.get(
         _URL, params={"lat": latitude, "lng": longitude, "date": date, "formatted": "0"}
     ).json()
@@ -100,7 +110,7 @@ def _get_sun_times(latitude, longitude, date):
 def _sun_time_gen(latitude, longtitude, now: datetime):
     date = now.date()
 
-    sunrise, sunset = _get_sun_times(latitude, longtitude, date.isoformat())
+    sunrise, sunset = _fetch_sun_times(latitude, longtitude, date.isoformat())
 
     if now < sunrise:
         yield now, SunAction.SET
@@ -114,6 +124,6 @@ def _sun_time_gen(latitude, longtitude, now: datetime):
 
     while True:
         date = date + datetime.timedelta(days=1)
-        sunrise, sunset = _get_sun_times(latitude, longtitude, date.isoformat())
+        sunrise, sunset = _fetch_sun_times(latitude, longtitude, date.isoformat())
         yield sunrise, SunAction.RISE
         yield sunset, SunAction.SET
