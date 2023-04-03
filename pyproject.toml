@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sun_stream"
-version = "0.1.1"
+version = "0.1.2"
 description = "Creating a stream of sun rises and sun sets, that only yields at the time of those events."
 authors = ["PowerSnail <hj@powersnail.com>"]
 readme = "README.md"
